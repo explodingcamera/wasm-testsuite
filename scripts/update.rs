@@ -4,12 +4,14 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use tempfile::TempDir;
 
-const WASM_1: Repo = Repo {
-    url: "https://github.com/WebAssembly/spec",
-    checkout: "wg-1.0",
-    subdir: "test/core",
-    name: "wasm-v1",
-};
+// not updated anymore, local copy has patches to support the latest wast syntax
+//
+// const WASM_1: Repo = Repo {
+//     url: "https://github.com/WebAssembly/spec",
+//     checkout: "wg-1.0",
+//     subdir: "test/core",
+//     name: "wasm-v1",
+// };
 
 const WASM_2: Repo = Repo {
     url: "https://github.com/WebAssembly/spec",
@@ -44,20 +46,20 @@ fn main() -> Result<()> {
         .expect("Expected base directory as first argument")
         .parse::<PathBuf>()?;
 
-    let repos = [WASM_1, WASM_2, WASM_3, WASM_MAIN];
+    let repos = [WASM_2, WASM_3, WASM_MAIN];
 
     // Process specific spec versions
     for repo in repos {
-        process_repo(&repo, base_dir.join(repo.name))?;
+        process_repo(&repo, &base_dir.join(repo.name))?;
     }
 
     // Process proposals
-    load_proposals(base_dir.join("proposals"))?;
+    load_proposals(&base_dir.join("proposals"))?;
 
     Ok(())
 }
 
-fn load_proposals(dest: PathBuf) -> Result<()> {
+fn load_proposals(dest: &Path) -> Result<()> {
     let temp_dir = TempDir::new()?;
     let temp_path = temp_dir.path();
 
@@ -71,7 +73,7 @@ fn load_proposals(dest: PathBuf) -> Result<()> {
         ])
         .status()?;
     let source_path = temp_path.join("proposals");
-    fs::create_dir_all(&dest)?;
+    fs::create_dir_all(dest)?;
 
     for entry in fs::read_dir(source_path)? {
         let entry = entry?;
@@ -97,7 +99,7 @@ fn load_proposals(dest: PathBuf) -> Result<()> {
     Ok(())
 }
 
-fn process_repo(repo: &Repo, dest: PathBuf) -> Result<()> {
+fn process_repo(repo: &Repo, dest: &Path) -> Result<()> {
     let temp_dir = TempDir::new()?;
     let temp_path = temp_dir.path();
 
@@ -107,21 +109,21 @@ fn process_repo(repo: &Repo, dest: PathBuf) -> Result<()> {
             "--depth",
             "1",
             "--branch",
-            &repo.checkout,
-            &repo.url,
+            repo.checkout,
+            repo.url,
             temp_path.to_str().unwrap(),
         ])
         .status()?;
 
     // Copy only `.wast` files from the subdirectory to the destination
-    let source_path = temp_path.join(&repo.subdir);
+    let source_path = temp_path.join(repo.subdir);
 
     if dest.exists() {
-        fs::remove_dir_all(&dest)?;
+        fs::remove_dir_all(dest)?;
     }
 
-    fs::create_dir_all(&dest)?;
-    copy_wast_files(&source_path, &dest)?;
+    fs::create_dir_all(dest)?;
+    copy_wast_files(&source_path, dest)?;
 
     Ok(())
 }

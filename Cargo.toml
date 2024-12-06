@@ -5,7 +5,7 @@ default-members=["scripts", "."]
 
 [package]
 name="wasm-testsuite"
-version="0.6.0"
+version="0.3.0"
 description="Generic test harness for WebAssembly Runtimes"
 license="Apache-2.0 OR MIT"
 readme="README.md"
@@ -14,7 +14,11 @@ include=["src/**/*", "data/**/*", "Cargo.toml"]
 
 [dependencies]
 include_dir="0.7.4"
-# wat="1.221"
-# thiserror="2"
+wast={version="221", optional=true}
+
+[dev-dependencies]
+eyre="0.6"
 
 [features]
+default=["wast"]
+wast=["dep:wast"]
