@@ -124,7 +124,7 @@ pub fn proposal(name: &Proposal) -> impl Iterator<Item = TestFile<'static>> {
             .unwrap_or_default()
             .to_string_lossy()
             .to_string(),
-        contents: file.contents(),
+        contents: file.contents_utf8().expect("file should be utf8"),
     })
 }
 
@@ -141,7 +141,7 @@ pub fn spec(version: &SpecVersion) -> impl Iterator<Item = TestFile<'static>> {
             .unwrap_or_default()
             .to_string_lossy()
             .to_string(),
-        contents: file.contents(),
+        contents: file.contents_utf8().expect("file should be utf8"),
     })
 }
 
@@ -150,7 +150,7 @@ pub fn spec(version: &SpecVersion) -> impl Iterator<Item = TestFile<'static>> {
 pub struct TestFile<'a> {
     parent: String,
     name: String,
-    contents: &'a [u8],
+    contents: &'a str,
 }
 
 impl<'a> TestFile<'a> {
@@ -165,21 +165,14 @@ impl<'a> TestFile<'a> {
     }
 
     /// Get the raw contents of the test file
-    pub fn raw(&self) -> &'a [u8] {
+    pub fn raw(&self) -> &'a str {
         self.contents
     }
 
     #[cfg(feature = "wast")]
     /// Parse the contents of the test file
     pub fn wast(&self) -> wast::parser::Result<WastBuffer<'a>> {
-        let wast = std::str::from_utf8(self.contents).map_err(|e| {
-            wast::Error::new(
-                wast::token::Span::from_offset(e.valid_up_to()),
-                e.to_string(),
-            )
-        })?;
-
-        let mut lexer = wast::lexer::Lexer::new(wast);
+        let mut lexer = wast::lexer::Lexer::new(self.contents);
         lexer.allow_confusing_unicode(true);
         let parse_buffer = wast::parser::ParseBuffer::new_with_lexer(lexer)?;
 
