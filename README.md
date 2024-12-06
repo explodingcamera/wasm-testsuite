@@ -1,6 +1,5 @@
 # `wasm-testsuite`
 
-> [!NOTE]  
 > `wasm-testsuite` used to be part of [`tinywasm`](https://github.com/explodingcamera/tinywam) and was extracted into its own crate.
 > Currently it only includes the test data and not a test runner.
 
