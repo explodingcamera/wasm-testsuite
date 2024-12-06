@@ -1,0 +1,12 @@
+[package]
+name="scripts"
+publish=false
+edition="2021"
+
+[[bin]]
+name="update"
+path="update.rs"
+
+[dependencies]
+tempfile="3"
+eyre="0.6"
