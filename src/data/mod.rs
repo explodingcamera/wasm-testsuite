@@ -148,9 +148,9 @@ pub fn spec(version: &SpecVersion) -> impl Iterator<Item = TestFile<'static>> {
 /// A test file
 #[derive(Debug)]
 pub struct TestFile<'a> {
-    parent: String,
-    name: String,
-    contents: &'a str,
+    pub parent: String,
+    pub name: String,
+    pub contents: &'a str,
 }
 
 impl<'a> TestFile<'a> {
