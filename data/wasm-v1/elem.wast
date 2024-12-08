@@ -13,9 +13,9 @@
   (elem 0x000 (offset (i32.const 0)))
   (elem 0 (offset (i32.const 0)) $f $f)
   (elem $t (i32.const 0))
-  (elem $t (i32.const 0) $f $f)
-  (elem $t (offset (i32.const 0)))
-  (elem $t (offset (i32.const 0)) $f $f)
+  (elem $t1 (i32.const 0) $f $f)
+  (elem $t2 (offset (i32.const 0)))
+  (elem $t3 (offset (i32.const 0)) $f $f)
 )
 
 ;; Basic use
@@ -139,107 +139,107 @@
 
 ;; Invalid bounds for elements
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 0 funcref)
     (func $f)
     (elem (i32.const 0) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 0 0 funcref)
     (func $f)
     (elem (i32.const 0) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 0 1 funcref)
     (func $f)
     (elem (i32.const 0) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 0 funcref)
     (elem (i32.const 1))
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 10 funcref)
     (func $f)
     (elem (i32.const 10) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
-(assert_unlinkable
+(assert_trap
   (module
     (import "spectest" "table" (table 10 funcref))
     (func $f)
     (elem (i32.const 10) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 10 20 funcref)
     (func $f)
     (elem (i32.const 10) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
-(assert_unlinkable
+(assert_trap
   (module
     (import "spectest" "table" (table 10 funcref))
     (func $f)
     (elem (i32.const 10) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 10 funcref)
     (func $f)
     (elem (i32.const -1) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
-(assert_unlinkable
+(assert_trap
   (module
     (import "spectest" "table" (table 10 funcref))
     (func $f)
     (elem (i32.const -1) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (table 10 funcref)
     (func $f)
     (elem (i32.const -10) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
-(assert_unlinkable
+(assert_trap
   (module
     (import "spectest" "table" (table 10 funcref))
     (func $f)
     (elem (i32.const -10) $f)
   )
-  "elements segment does not fit"
+  "out of bounds table access"
 )
 
 ;; Element without table

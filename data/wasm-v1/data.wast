@@ -13,9 +13,9 @@
   (data 0x000 (offset (i32.const 0)))
   (data 0 (offset (i32.const 0)) "" "a" "bc" "")
   (data $m (i32.const 0))
-  (data $m (i32.const 1) "a" "" "bcd")
-  (data $m (offset (i32.const 0)))
-  (data $m (offset (i32.const 0)) "" "a" "bc" "")
+  (data $m1 (i32.const 1) "a" "" "bcd")
+  (data $m2 (offset (i32.const 0)))
+  (data $m3 (offset (i32.const 0)) "" "a" "bc" "")
 )
 
 ;; Basic use
@@ -158,48 +158,48 @@
 
 ;; Invalid bounds for data
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 0)
     (data (i32.const 0) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 0 0)
     (data (i32.const 0) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 0 1)
     (data (i32.const 0) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 0)
     (data (i32.const 1))
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 0 1)
     (data (i32.const 1))
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
 ;; This seems to cause a time-out on Travis.
-(;assert_unlinkable
+(;assert_trap
   (module
     (memory 0x10000)
     (data (i32.const 0xffffffff) "ab")
@@ -207,74 +207,74 @@
   ""  ;; either out of memory or segment does not fit
 ;)
 
-(assert_unlinkable
+(assert_trap
   (module
     (global (import "spectest" "global_i32") i32)
     (memory 0)
     (data (global.get 0) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 1 2)
     (data (i32.const 0x1_0000) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
-(assert_unlinkable
+(assert_trap
   (module
     (import "spectest" "memory" (memory 1))
     (data (i32.const 0x1_0000) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 2)
     (data (i32.const 0x2_0000) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 2 3)
     (data (i32.const 0x2_0000) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 1)
     (data (i32.const -1) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
-(assert_unlinkable
+(assert_trap
   (module
     (import "spectest" "memory" (memory 1))
     (data (i32.const -1) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
-(assert_unlinkable
+(assert_trap
   (module
     (memory 2)
     (data (i32.const -100) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
-(assert_unlinkable
+(assert_trap
   (module
     (import "spectest" "memory" (memory 1))
     (data (i32.const -100) "a")
   )
-  "data segment does not fit"
+  "out of bounds memory access"
 )
 
 ;; Data without memory

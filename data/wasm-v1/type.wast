@@ -49,11 +49,12 @@
   "unexpected token"
 )
 
-(assert_invalid
-  (module (type (func (result i32 i32))))
-  "invalid result arity"
-)
-(assert_invalid
-  (module (type (func (result i32) (result i32))))
-  "invalid result arity"
-)
+;; valid in later wasm versions
+;; (assert_invalid
+;;   (module (type (func (result i32 i32))))
+;;   "invalid result arity"
+;; )
+;; (assert_invalid
+;;   (module (type (func (result i32) (result i32))))
+;;   "invalid result arity"
+;; )
