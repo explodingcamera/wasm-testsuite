@@ -6,7 +6,7 @@
 [![crates.io](https://img.shields.io/crates/v/wasm-testsuite.svg)](https://crates.io/crates/wasm-testsuite)
 [![docs.rs](https://docs.rs/wasm-testsuite/badge.svg)](https://docs.rs/wasm-testsuite)
 
-This crate contains the the [WebAssembly Test Suite](https://github.com/WebAssembly/spec/tree/main/test) for all versions of the WebAssembly spec and new proposals that are not yet part of the spec. Tests cases can change between minor versions of this crate as new tests are added or existing tests are modified.
+This crate contains the the [WebAssembly Test Suite](https://github.com/WebAssembly/spec/tree/main/test) for all versions of the WebAssembly spec and new proposals that are not yet part of the spec. Tests cases and the wast version can change between minor versions of this crate as new tests are added or existing tests are modified, so be sure to pin the version of this crate in your `Cargo.toml` (e.g. `wasm-testsuite = "=0.4.4"`).
 
 ## Usage
 

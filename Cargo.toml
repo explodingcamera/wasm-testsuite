@@ -1,23 +1,23 @@
 [workspace]
-resolver="2"
+resolver="3"
 members=[".", "scripts"]
 default-members=["scripts", "."]
 
 [package]
 name="wasm-testsuite"
-version="0.4.3"
+version="0.4.4"
 description="Generic test harness for WebAssembly Runtimes"
 authors=["Henry Gressmann <mail@henrygressmann.de>"]
 repository="https://github.com/explodingcamera/tinywasm"
 license="Apache-2.0"
 readme="README.md"
-edition="2021"
+edition="2024"
 include=["src/**/*", "data/**/*", "Cargo.toml"]
-rust-version="1.83"
+rust-version="1.85"
 
 [dependencies]
 include_dir="0.7.4"
-wast={version="225", optional=true}
+wast={version="226", optional=true}
 
 [dev-dependencies]
 eyre="0.6"

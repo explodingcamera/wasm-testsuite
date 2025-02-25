@@ -140,7 +140,7 @@ fn copy_wast_files(source: &Path, dest: &Path) -> Result<()> {
     for entry in fs::read_dir(source)? {
         let entry = entry?;
         let path = entry.path();
-        if path.is_file() && path.extension().map_or(false, |ext| ext == "wast") {
+        if path.is_file() && path.extension().is_some_and(|ext| ext == "wast") {
             let dest_file_path = dest.join(entry.file_name());
             if let Some(parent) = dest_file_path.parent() {
                 fs::create_dir_all(parent)?;
