@@ -17,21 +17,28 @@ const WASM_2: Repo = Repo {
     url: "https://github.com/WebAssembly/spec",
     checkout: "wg-2.0.draft1",
     subdir: "test/core",
-    name: "wasm-v2",
+    dest: "wasm-v2",
 };
 
 const WASM_3: Repo = Repo {
     url: "https://github.com/WebAssembly/spec",
     checkout: "wasm-3.0",
     subdir: "test/core",
-    name: "wasm-v3",
+    dest: "wasm-v3",
+};
+
+const WASM_SIMD: Repo = Repo {
+    url: "https://github.com/WebAssembly/spec",
+    checkout: "wasm-3.0",
+    subdir: "test/core/simd",
+    dest: "proposals/simd",
 };
 
 const WASM_MAIN: Repo = Repo {
     url: "https://github.com/WebAssembly/spec",
     checkout: "main",
     subdir: "test/core",
-    name: "wasm-latest",
+    dest: "wasm-latest",
 };
 
 fn main() -> Result<()> {
@@ -46,11 +53,11 @@ fn main() -> Result<()> {
         .expect("Expected base directory as first argument")
         .parse::<PathBuf>()?;
 
-    let repos = [WASM_2, WASM_3, WASM_MAIN];
+    let repos = [WASM_2, WASM_3, WASM_MAIN, WASM_SIMD];
 
     // Process specific spec versions
     for repo in repos {
-        process_repo(&repo, &base_dir.join(repo.name))?;
+        process_repo(&repo, &base_dir.join(repo.dest))?;
     }
 
     // Process proposals
@@ -155,7 +162,7 @@ fn copy_wast_files(source: &Path, dest: &Path) -> Result<()> {
 #[derive(Debug, Clone, Copy)]
 struct Repo {
     url: &'static str,
-    name: &'static str,
+    dest: &'static str,
     checkout: &'static str,
     subdir: &'static str,
 }
