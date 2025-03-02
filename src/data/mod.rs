@@ -3,10 +3,11 @@ use std::{fmt::Debug, str::FromStr};
 
 static DATA: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/data");
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Proposal {
     Annotations,
+    BulkMemoryOperations,
     CustomPageSizes,
     ExceptionHandling,
     ExtendedConst,
@@ -14,7 +15,12 @@ pub enum Proposal {
     GC,
     Memory64,
     MultiMemory,
+    MultiValue,
+    MutableGlobal,
+    NontrappingFloatToIntConversions,
+    ReferenceTypes,
     RelaxedSimd,
+    SignExtensionOps,
     Simd,
     TailCall,
     Threads,
@@ -25,6 +31,7 @@ impl Proposal {
     pub fn all() -> &'static [Proposal] {
         &[
             Proposal::Annotations,
+            Proposal::BulkMemoryOperations,
             Proposal::CustomPageSizes,
             Proposal::ExceptionHandling,
             Proposal::ExtendedConst,
@@ -32,12 +39,24 @@ impl Proposal {
             Proposal::GC,
             Proposal::Memory64,
             Proposal::MultiMemory,
+            Proposal::MultiValue,
+            Proposal::MutableGlobal,
+            Proposal::NontrappingFloatToIntConversions,
+            Proposal::ReferenceTypes,
             Proposal::RelaxedSimd,
+            Proposal::SignExtensionOps,
             Proposal::Simd,
             Proposal::TailCall,
             Proposal::Threads,
             Proposal::WideArithmetic,
         ]
+    }
+}
+
+impl ToString for Proposal {
+    fn to_string(&self) -> String {
+        let name: &'static str = (*self).into();
+        name.to_string()
     }
 }
 
@@ -57,6 +76,12 @@ impl From<Proposal> for &'static str {
             Proposal::TailCall => "tail-call",
             Proposal::Threads => "threads",
             Proposal::WideArithmetic => "wide-arithmetic",
+            Proposal::BulkMemoryOperations => "bulk-memory-operations",
+            Proposal::MultiValue => "multi-value",
+            Proposal::MutableGlobal => "mutable-global",
+            Proposal::NontrappingFloatToIntConversions => "nontrapping-float-to-int-conversions",
+            Proposal::ReferenceTypes => "reference-types",
+            Proposal::SignExtensionOps => "sign-extension-ops",
         }
     }
 }
@@ -79,6 +104,12 @@ impl FromStr for Proposal {
             "tail-call" => Proposal::TailCall,
             "threads" => Proposal::Threads,
             "wide-arithmetic" => Proposal::WideArithmetic,
+            "bulk-memory-operations" => Proposal::BulkMemoryOperations,
+            "multi-value" => Proposal::MultiValue,
+            "mutable-global" => Proposal::MutableGlobal,
+            "nontrapping-float-to-int-conversions" => Proposal::NontrappingFloatToIntConversions,
+            "reference-types" => Proposal::ReferenceTypes,
+            "sign-extension-ops" => Proposal::SignExtensionOps,
             _ => return Err(()),
         })
     }
@@ -211,13 +242,27 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_enum() {
+        for p in Proposal::all() {
+            let name = p.to_string();
+            let parsed = Proposal::from_str(&name).expect("Failed to parse proposal");
+            assert_eq!(*p, parsed);
+        }
+    }
+
+    #[test]
     fn test_proposals() {
         for p in Proposal::all() {
             for test in proposal(p) {
-                test.wast()
-                    .expect("Failed to lex wast")
-                    .directives()
-                    .expect("Failed to parse wast");
+                match test.wast().expect("Failed to lex wast").directives() {
+                    Err(e) => {
+                        panic!(
+                            "Failed to parse wast for {}/{}: {e:?}",
+                            test.parent, test.name
+                        );
+                    }
+                    Ok(_) => {}
+                }
             }
         }
     }
@@ -226,10 +271,12 @@ mod tests {
     fn test_spec_versions() {
         for v in SpecVersion::all() {
             for test in spec(v) {
-                test.wast()
-                    .expect("Failed to lex wast")
-                    .directives()
-                    .expect("Failed to parse wast");
+                match test.wast().expect("Failed to lex wast").directives() {
+                    Err(e) => {
+                        panic!("Failed to parse wast: {:?}, {test:?}", e);
+                    }
+                    Ok(_) => {}
+                }
             }
         }
     }

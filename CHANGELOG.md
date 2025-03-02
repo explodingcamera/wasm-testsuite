@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.5] - 2025-02-25
 
+- Fixed the `memory64` proposal (has now been merged into wasm-3.0)
+- Added old proposals that have since been stabilized (`multi-value`, `mutable-global`, `nontrapping-floating-point-conversions`, `sign-extension-ops`, `reference-types`, `bulk-memory-operations`)
+
+## [0.4.5] - 2025-02-25
+
 - Added `simd` proposal
 
 ## [0.4.4] - 2025-02-25
