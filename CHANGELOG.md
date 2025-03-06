@@ -5,7 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.4.5] - 2025-02-25
+## [0.5.1] - 2025-02-06
+
+- Updated to `wast` 227
+- Updated tests
+
+## [0.5.0] - 2025-03-02
 
 - Fixed the `memory64` proposal (has now been merged into wasm-3.0)
 - Added old proposals that have since been stabilized (`multi-value`, `mutable-global`, `nontrapping-floating-point-conversions`, `sign-extension-ops`, `reference-types`, `bulk-memory-operations`)
