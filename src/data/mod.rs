@@ -1,5 +1,8 @@
 use include_dir::{Dir, include_dir};
-use std::{fmt::Debug, str::FromStr};
+use std::{
+    fmt::{Debug, Display},
+    str::FromStr,
+};
 
 static DATA: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/data");
 
@@ -53,10 +56,9 @@ impl Proposal {
     }
 }
 
-impl ToString for Proposal {
-    fn to_string(&self) -> String {
-        let name: &'static str = (*self).into();
-        name.to_string()
+impl Display for Proposal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str((*self).into())
     }
 }
 
@@ -254,14 +256,11 @@ mod tests {
     fn test_proposals() {
         for p in Proposal::all() {
             for test in proposal(p) {
-                match test.wast().expect("Failed to lex wast").directives() {
-                    Err(e) => {
-                        panic!(
-                            "Failed to parse wast for {}/{}: {e:?}",
-                            test.parent, test.name
-                        );
-                    }
-                    Ok(_) => {}
+                if let Err(e) = test.wast().expect("Failed to lex wast").directives() {
+                    panic!(
+                        "Failed to parse wast for {}/{}: {e:?}",
+                        test.parent, test.name
+                    );
                 }
             }
         }
@@ -271,11 +270,8 @@ mod tests {
     fn test_spec_versions() {
         for v in SpecVersion::all() {
             for test in spec(v) {
-                match test.wast().expect("Failed to lex wast").directives() {
-                    Err(e) => {
-                        panic!("Failed to parse wast: {:?}, {test:?}", e);
-                    }
-                    Ok(_) => {}
+                if let Err(e) = test.wast().expect("Failed to lex wast").directives() {
+                    panic!("Failed to parse wast: {:?}, {test:?}", e);
                 }
             }
         }
