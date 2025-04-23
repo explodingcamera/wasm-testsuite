@@ -88,6 +88,12 @@ impl From<Proposal> for &'static str {
     }
 }
 
+impl Into<Proposal> for &Proposal {
+    fn into(self) -> Proposal {
+        *self
+    }
+}
+
 impl FromStr for Proposal {
     type Err = ();
 
@@ -126,6 +132,12 @@ pub enum SpecVersion {
     Latest,
 }
 
+impl Into<SpecVersion> for &SpecVersion {
+    fn into(self) -> SpecVersion {
+        *self
+    }
+}
+
 impl SpecVersion {
     fn name(self) -> &'static str {
         match self {
@@ -147,8 +159,8 @@ impl SpecVersion {
 }
 
 /// Get all test files associated with a proposal
-pub fn proposal(name: &Proposal) -> impl Iterator<Item = TestFile<'static>> {
-    let name: &'static str = (*name).into();
+pub fn proposal(name: impl Into<Proposal>) -> impl Iterator<Item = TestFile<'static>> {
+    let name: &'static str = name.into().into();
     let tests = DATA
         .get_dir(format!("proposals/{name}"))
         .expect("spec dir should always exist");
@@ -166,8 +178,8 @@ pub fn proposal(name: &Proposal) -> impl Iterator<Item = TestFile<'static>> {
 }
 
 /// Get all test files associated with a spec version
-pub fn spec(version: &SpecVersion) -> impl Iterator<Item = TestFile<'static>> {
-    let name = version.name();
+pub fn spec(version: impl Into<SpecVersion>) -> impl Iterator<Item = TestFile<'static>> {
+    let name = version.into().name();
     let tests = DATA.get_dir(name).expect("spec dir should always exist");
 
     tests.files().map(|file| TestFile {
@@ -221,7 +233,7 @@ impl<'a> TestFile<'a> {
 
 /// A wrapper around [`wast::parser::ParseBuffer`]
 pub struct WastBuffer<'a> {
-    // this wrapper struct is neccecary to not use self-referential structs as WastDirective
+    // this wrapper struct is necessary to not use self-referential structs as WastDirective
     // contains a reference to the buffer which contains a reference to the original file data.
     buffer: wast::parser::ParseBuffer<'a>,
 }

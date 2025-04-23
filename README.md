@@ -19,7 +19,7 @@ Tests cases and the wast version can change between minor versions of this crate
 use wasm_testsuite::data::{Proposal, SpecVersion, proposal, spec};
 
 fn main() -> eyre::Result<()> {
-    for test in spec(&SpecVersion::V2) {
+    for test in spec(SpecVersion::V2) {
         let name = test.name();
         let raw = test.raw();
         let wast_directives = test.wast()?.directives();
