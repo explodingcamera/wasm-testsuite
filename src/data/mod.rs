@@ -88,9 +88,9 @@ impl From<Proposal> for &'static str {
     }
 }
 
-impl Into<Proposal> for &Proposal {
-    fn into(self) -> Proposal {
-        *self
+impl From<&Proposal> for Proposal {
+    fn from(val: &Proposal) -> Self {
+        *val
     }
 }
 
@@ -132,9 +132,9 @@ pub enum SpecVersion {
     Latest,
 }
 
-impl Into<SpecVersion> for &SpecVersion {
-    fn into(self) -> SpecVersion {
-        *self
+impl From<&SpecVersion> for SpecVersion {
+    fn from(val: &SpecVersion) -> Self {
+        *val
     }
 }
 

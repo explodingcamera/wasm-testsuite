@@ -5,7 +5,7 @@ default-members=["scripts", "."]
 
 [package]
 name="wasm-testsuite"
-version="0.5.4"
+version="0.5.5"
 description="Generic test harness for WebAssembly Runtimes"
 authors=["Henry Gressmann <mail@henrygressmann.de>"]
 repository="https://github.com/explodingcamera/tinywasm"
