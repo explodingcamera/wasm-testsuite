@@ -283,7 +283,7 @@ mod tests {
         for v in SpecVersion::all() {
             for test in spec(v) {
                 if let Err(e) = test.wast().expect("Failed to lex wast").directives() {
-                    panic!("Failed to parse wast: {:?}, {test:?}", e);
+                    panic!("Failed to parse wast: {e:?}, {test:?}");
                 }
             }
         }
