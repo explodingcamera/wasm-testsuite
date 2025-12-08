@@ -12,6 +12,7 @@ pub enum Proposal {
     Annotations,
     BulkMemoryOperations,
     CustomPageSizes,
+    CustomDescriptors,
     ExceptionHandling,
     ExtendedConst,
     FunctionReferences,
@@ -36,6 +37,7 @@ impl Proposal {
             Proposal::Annotations,
             Proposal::BulkMemoryOperations,
             Proposal::CustomPageSizes,
+            Proposal::CustomDescriptors,
             Proposal::ExceptionHandling,
             Proposal::ExtendedConst,
             Proposal::FunctionReferences,
@@ -67,6 +69,7 @@ impl From<Proposal> for &'static str {
         match proposal {
             Proposal::Annotations => "annotations",
             Proposal::CustomPageSizes => "custom-page-sizes",
+            Proposal::CustomDescriptors => "custom-descriptors",
             Proposal::ExceptionHandling => "exception-handling",
             Proposal::ExtendedConst => "extended-const",
             Proposal::FunctionReferences => "function-references",
@@ -101,6 +104,7 @@ impl FromStr for Proposal {
         Ok(match s {
             "annotations" => Proposal::Annotations,
             "custom-page-sizes" => Proposal::CustomPageSizes,
+            "custom-descriptors" => Proposal::CustomDescriptors,
             "exception-handling" => Proposal::ExceptionHandling,
             "extended-const" => Proposal::ExtendedConst,
             "function-references" => Proposal::FunctionReferences,
