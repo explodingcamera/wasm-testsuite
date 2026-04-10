@@ -253,6 +253,30 @@
   (func (export "try-with-param")
     (i32.const 0) (try_table (param i32) (drop))
   )
+
+  (func (export "duplicated-catches") (result i32)
+    (block
+      (block
+        (try_table (catch $e0 0) (catch $e0 1)
+          (throw $e0)
+        )
+      )
+      (return (i32.const 2))
+    )
+    (return (i32.const 3))
+  )
+
+  (func (export "catch-all-before-catch") (result i32)
+    (block
+      (block
+        (try_table (catch_all 0) (catch $e0 1)
+          (throw $e0)
+        )
+      )
+      (return (i32.const 2))
+    )
+    (return (i32.const 3))
+  )
 )
 
 (assert_return (invoke "simple-throw-catch" (i32.const 0)) (i32.const 23))
@@ -311,6 +335,9 @@
 (assert_exception (invoke "return-call-indirect-in-try-catch"))
 
 (assert_return (invoke "try-with-param"))
+
+(assert_return (invoke "duplicated-catches") (i32.const 2))
+(assert_return (invoke "catch-all-before-catch") (i32.const 2))
 
 (module
   (func $imported-throw (import "test" "throw"))
@@ -388,3 +415,109 @@
   )
   "type mismatch"
 )
+
+
+(module
+  (type $t (func))
+  (func $dummy)
+  (elem declare func $dummy)
+
+  (tag $e (param (ref $t)))
+  (func $throw (throw $e (ref.func $dummy)))
+
+  (func (export "catch") (result (ref null $t))
+    (block $l (result (ref null $t))
+      (try_table (catch $e $l) (call $throw))
+      (unreachable)
+    )
+  )
+  (func (export "catch_ref1") (result (ref null $t))
+    (block $l (result (ref null $t) (ref exn))
+      (try_table (catch_ref $e $l) (call $throw))
+      (unreachable)
+    )
+    (drop)
+  )
+  (func (export "catch_ref2") (result (ref null $t))
+    (block $l (result (ref null $t) (ref null exn))
+      (try_table (catch_ref $e $l) (call $throw))
+      (unreachable)
+    )
+    (drop)
+  )
+  (func (export "catch_all_ref1")
+    (block $l (result (ref exn))
+      (try_table (catch_all_ref $l) (call $throw))
+      (unreachable)
+    )
+    (drop)
+  )
+  (func (export "catch_all_ref2")
+    (block $l (result (ref null exn))
+      (try_table (catch_all_ref $l) (call $throw))
+      (unreachable)
+    )
+    (drop)
+  )
+)
+
+(assert_return (invoke "catch") (ref.func))
+(assert_return (invoke "catch_ref1") (ref.func))
+(assert_return (invoke "catch_ref2") (ref.func))
+(assert_return (invoke "catch_all_ref1"))
+(assert_return (invoke "catch_all_ref2"))
+
+(assert_invalid
+  (module
+    (type $t (func))
+    (tag $e (param (ref null $t)))
+    (func (export "catch") (result (ref $t))
+      (block $l (result (ref $t))
+        (try_table (catch $e $l))
+        (unreachable)
+      )
+    )
+  )
+  "type mismatch"
+)
+(assert_invalid
+  (module
+    (type $t (func))
+    (tag $e (param (ref null $t)))
+    (func (export "catch_ref") (result (ref $t))
+      (block $l (result (ref $t) (ref exn))
+        (try_table (catch_ref $e $l))
+        (unreachable)
+      )
+    )
+  )
+  "type mismatch"
+)
+
+;; try_table acts a regular block for br, etc.
+
+(module
+  (func (export "as-br-target") (result i32)
+    (block
+      (try_table
+        (br 0)
+        (unreachable)
+      )
+      (return (i32.const 111))
+    )
+    (i32.const 222)
+  )
+
+  (func (export "as-value-provider") (result i32)
+    (block
+      (try_table (result i32)
+        (br 0 (i32.const 333))
+      )
+      (return)
+    )
+    (unreachable)
+  )
+)
+
+(assert_return (invoke "as-br-target") (i32.const 111))
+(assert_return (invoke "as-value-provider") (i32.const 333))

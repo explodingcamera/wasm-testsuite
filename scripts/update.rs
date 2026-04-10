@@ -4,43 +4,6 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use tempfile::TempDir;
 
-// not updated anymore, local copy has patches to support the latest wast syntax
-//
-// const WASM_1: Repo = Repo {
-//     url: "https://github.com/WebAssembly/spec",
-//     checkout: "wg-1.0",
-//     subdir: "test/core",
-//     name: "wasm-v1",
-// };
-
-const WASM_2: Repo = Repo {
-    url: "https://github.com/WebAssembly/spec",
-    checkout: "wg-2.0.draft1",
-    subdir: "test/core",
-    dest: "wasm-v2",
-};
-
-const WASM_3: Repo = Repo {
-    url: "https://github.com/WebAssembly/spec",
-    checkout: "wasm-3.0",
-    subdir: "test/core",
-    dest: "wasm-v3",
-};
-
-const WASM_SIMD: Repo = Repo {
-    url: "https://github.com/WebAssembly/spec",
-    checkout: "wasm-3.0",
-    subdir: "test/core/simd",
-    dest: "proposals/simd",
-};
-
-const WASM_MAIN: Repo = Repo {
-    url: "https://github.com/WebAssembly/spec",
-    checkout: "main",
-    subdir: "test/core",
-    dest: "wasm-latest",
-};
-
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 2 {
@@ -53,12 +16,34 @@ fn main() -> Result<()> {
         .expect("Expected base directory as first argument")
         .parse::<PathBuf>()?;
 
-    let repos = [WASM_2, WASM_3, WASM_MAIN, WASM_SIMD];
+    let repos = [
+        Repo {
+            url: "https://github.com/WebAssembly/spec",
+            checkout: "wg-2.0",
+            subdir: "test/core",
+            dest: "wasm-v2",
+        },
+        Repo {
+            url: "https://github.com/WebAssembly/spec",
+            checkout: "wg-3.0",
+            subdir: "test/core",
+            dest: "wasm-v3",
+        },
+        Repo {
+            url: "https://github.com/WebAssembly/spec",
+            checkout: "main",
+            subdir: "test/core",
+            dest: "wasm-latest",
+        },
+    ];
 
     // Process specific spec versions
     for repo in repos {
         process_repo(&repo, &base_dir.join(repo.dest))?;
     }
+
+    // Process latest proposals
+    process_latest(&base_dir)?;
 
     // Process proposals
     load_proposals(&base_dir.join("proposals"))?;
@@ -101,6 +86,78 @@ fn load_proposals(dest: &Path) -> Result<()> {
             fs::create_dir_all(&dest_proposal_path)?;
             copy_wast_files(&path, &dest_proposal_path)?;
         }
+    }
+
+    Ok(())
+}
+
+fn process_latest(base_dir: &Path) -> Result<()> {
+    let temp_dir = TempDir::new()?;
+    let temp_path = temp_dir.path();
+
+    Command::new("git")
+        .args([
+            "clone",
+            "--depth",
+            "1",
+            "--branch",
+            "main",
+            "https://github.com/WebAssembly/spec",
+            temp_path.to_str().unwrap(),
+        ])
+        .status()?;
+
+    let core_path = temp_path.join("test/core");
+
+    let latest_dest = base_dir.join("wasm-latest");
+    if latest_dest.exists() {
+        fs::remove_dir_all(&latest_dest)?;
+    }
+    fs::create_dir_all(&latest_dest)?;
+    copy_wast_files(&core_path, &latest_dest)?;
+
+    let proposals_dest = base_dir.join("proposals");
+    fs::create_dir_all(&proposals_dest)?;
+
+    for entry in fs::read_dir(&core_path)? {
+        let entry = entry?;
+        let proposal_source = entry.path();
+        if !proposal_source.is_dir() {
+            continue;
+        }
+
+        const SKIP_PROPOSALS: &[&str] = &["memory64"];
+        if SKIP_PROPOSALS
+            .iter()
+            .any(|skip| proposal_source.file_name().unwrap_or_default() == *skip)
+        {
+            continue;
+        }
+
+        let has_wast_files = fs::read_dir(&proposal_source)?.any(|proposal_entry| {
+            proposal_entry
+                .ok()
+                .map(|proposal_entry| {
+                    proposal_entry.path().is_file()
+                        && proposal_entry
+                            .path()
+                            .extension()
+                            .is_some_and(|ext| ext == "wast")
+                })
+                .unwrap_or(false)
+        });
+
+        if !has_wast_files {
+            continue;
+        }
+
+        let proposal_dest = proposals_dest.join(entry.file_name());
+        if proposal_dest.exists() {
+            fs::remove_dir_all(&proposal_dest)?;
+        }
+
+        fs::create_dir_all(&proposal_dest)?;
+        copy_wast_files(&proposal_source, &proposal_dest)?;
     }
 
     Ok(())
