@@ -5,7 +5,7 @@ default-members=["scripts", "."]
 
 [package]
 name="wasm-testsuite"
-version="0.7.0"
+version="0.7.1"
 description="Generic test harness for WebAssembly Runtimes"
 authors=["Henry Gressmann <crates@henrygressmann.de>"]
 repository="https://github.com/explodingcamera/wasm-testsuite"
@@ -13,7 +13,7 @@ license="Apache-2.0"
 readme="README.md"
 edition="2024"
 include=["src/**/*", "data/**/*", "Cargo.toml"]
-rust-version="1.90"
+rust-version="1.93"
 
 [dependencies]
 include_dir="0.7"
