@@ -1,6 +1,6 @@
 # `wasm-testsuite`
 
-This repository contains copies of the [WebAssembly Test Suite](https://github.com/WebAssembly/spec/tree/main/test) for all WebAssembly versions and proposals (even those that are now part of the spec).
+This repository contains copies of the [WebAssembly Test Suite](https://github.com/WebAssembly/spec/tree/main/test) for all WebAssembly versions and proposals (including those that have been merged into newer versions of the spec).
 
 Older tests have been ported to newer versions of the wast file format, and some tests have been modified to not fail due to relaxed validation rules in later versions.
 
@@ -11,7 +11,7 @@ All tests are also available as a Rust crate, `wasm-testsuite`, which provides u
 [![crates.io](https://img.shields.io/crates/v/wasm-testsuite.svg)](https://crates.io/crates/wasm-testsuite)
 [![docs.rs](https://docs.rs/wasm-testsuite/badge.svg)](https://docs.rs/wasm-testsuite)
 
-Tests cases and the wast version can change between minor versions of this crate as new tests are added or existing tests are modified, so be sure to pin the version of this crate in your `Cargo.toml` (e.g. `wasm-testsuite = "=0.4.4"`).
+Tests cases can change between minor versions of this crate as new tests are added or existing tests are modified, so be sure to pin the version of this crate in your `Cargo.toml` (e.g. `wasm-testsuite = "=0.4.4"`).
 
 ## Usage
 
