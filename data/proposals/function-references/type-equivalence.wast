@@ -27,12 +27,13 @@
 
 ;; Recursive types.
 
-(assert_invalid
-  (module
-    (type $t (func (result (ref $t))))
-  )
-  "unknown type"
-)
+;; Self-recursive types are valid when the GC proposal is enabled.
+;; (assert_invalid
+;;   (module
+;;     (type $t (func (result (ref $t))))
+;;   )
+;;   "unknown type"
+;; )
 
 (assert_invalid
   (module

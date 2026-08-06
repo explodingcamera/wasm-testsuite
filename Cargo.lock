@@ -222,7 +222,7 @@ dependencies = [
 
 [[package]]
 name = "wasm-testsuite"
-version = "0.7.4"
+version = "0.7.5"
 dependencies = [
  "eyre",
  "include_dir",

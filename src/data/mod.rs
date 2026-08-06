@@ -153,30 +153,18 @@ impl SpecVersion {
     }
 
     pub fn all() -> &'static [SpecVersion] {
-        &[
-            SpecVersion::V1,
-            SpecVersion::V2,
-            SpecVersion::V3,
-            SpecVersion::Latest,
-        ]
+        &[SpecVersion::V1, SpecVersion::V2, SpecVersion::V3, SpecVersion::Latest]
     }
 }
 
 /// Get all test files associated with a proposal
 pub fn proposal(name: impl Into<Proposal>) -> impl Iterator<Item = TestFile<'static>> {
     let name: &'static str = name.into().into();
-    let tests = DATA
-        .get_dir(format!("proposals/{name}"))
-        .expect("spec dir should always exist");
+    let tests = DATA.get_dir(format!("proposals/{name}")).expect("spec dir should always exist");
 
     tests.files().map(|file| TestFile {
         parent: name.to_string(),
-        name: file
-            .path()
-            .file_name()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_string(),
+        name: file.path().file_name().unwrap_or_default().to_string_lossy().to_string(),
         contents: file.contents_utf8().expect("file should be utf8"),
     })
 }
@@ -188,12 +176,7 @@ pub fn spec(version: impl Into<SpecVersion>) -> impl Iterator<Item = TestFile<'s
 
     tests.files().map(|file| TestFile {
         parent: name.to_string(),
-        name: file
-            .path()
-            .file_name()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_string(),
+        name: file.path().file_name().unwrap_or_default().to_string_lossy().to_string(),
         contents: file.contents_utf8().expect("file should be utf8"),
     })
 }
@@ -229,9 +212,7 @@ impl<'a> TestFile<'a> {
         lexer.allow_confusing_unicode(true);
         let parse_buffer = wast::parser::ParseBuffer::new_with_lexer(lexer)?;
 
-        Ok(WastBuffer {
-            buffer: parse_buffer,
-        })
+        Ok(WastBuffer { buffer: parse_buffer })
     }
 }
 
@@ -273,10 +254,7 @@ mod tests {
         for p in Proposal::all() {
             for test in proposal(p) {
                 if let Err(e) = test.wast().expect("Failed to lex wast").directives() {
-                    panic!(
-                        "Failed to parse wast for {}/{}: {e:?}",
-                        test.parent, test.name
-                    );
+                    panic!("Failed to parse wast for {}/{}: {e:?}", test.parent, test.name);
                 }
             }
         }

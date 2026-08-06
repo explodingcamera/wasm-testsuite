@@ -11,30 +11,11 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    let base_dir = args
-        .get(1)
-        .expect("Expected base directory as first argument")
-        .parse::<PathBuf>()?;
+    let base_dir = args.get(1).expect("Expected base directory as first argument").parse::<PathBuf>()?;
 
     let repos = [
-        Repo {
-            url: "https://github.com/WebAssembly/spec",
-            checkout: "wg-2.0",
-            subdir: "test/core",
-            dest: "wasm-v2",
-        },
-        Repo {
-            url: "https://github.com/WebAssembly/spec",
-            checkout: "wg-3.0",
-            subdir: "test/core",
-            dest: "wasm-v3",
-        },
-        Repo {
-            url: "https://github.com/WebAssembly/spec",
-            checkout: "main",
-            subdir: "test/core",
-            dest: "wasm-latest",
-        },
+        Repo { url: "https://github.com/WebAssembly/spec", checkout: "wg-3.0", subdir: "test/core", dest: "wasm-v3" },
+        Repo { url: "https://github.com/WebAssembly/spec", checkout: "main", subdir: "test/core", dest: "wasm-latest" },
     ];
 
     // Process specific spec versions
@@ -56,13 +37,7 @@ fn load_proposals(dest: &Path) -> Result<()> {
     let temp_path = temp_dir.path();
 
     Command::new("git")
-        .args([
-            "clone",
-            "--depth",
-            "1",
-            "https://github.com/WebAssembly/testsuite",
-            temp_path.to_str().unwrap(),
-        ])
+        .args(["clone", "--depth", "1", "https://github.com/WebAssembly/testsuite", temp_path.to_str().unwrap()])
         .status()?;
     let source_path = temp_path.join("proposals");
     fs::create_dir_all(dest)?;
@@ -127,10 +102,7 @@ fn process_latest(base_dir: &Path) -> Result<()> {
         }
 
         const SKIP_PROPOSALS: &[&str] = &["memory64"];
-        if SKIP_PROPOSALS
-            .iter()
-            .any(|skip| proposal_source.file_name().unwrap_or_default() == *skip)
-        {
+        if SKIP_PROPOSALS.iter().any(|skip| proposal_source.file_name().unwrap_or_default() == *skip) {
             continue;
         }
 
@@ -139,10 +111,7 @@ fn process_latest(base_dir: &Path) -> Result<()> {
                 .ok()
                 .map(|proposal_entry| {
                     proposal_entry.path().is_file()
-                        && proposal_entry
-                            .path()
-                            .extension()
-                            .is_some_and(|ext| ext == "wast")
+                        && proposal_entry.path().extension().is_some_and(|ext| ext == "wast")
                 })
                 .unwrap_or(false)
         });
@@ -168,15 +137,7 @@ fn process_repo(repo: &Repo, dest: &Path) -> Result<()> {
     let temp_path = temp_dir.path();
 
     Command::new("git")
-        .args([
-            "clone",
-            "--depth",
-            "1",
-            "--branch",
-            repo.checkout,
-            repo.url,
-            temp_path.to_str().unwrap(),
-        ])
+        .args(["clone", "--depth", "1", "--branch", repo.checkout, repo.url, temp_path.to_str().unwrap()])
         .status()?;
 
     // Copy only `.wast` files from the subdirectory to the destination
