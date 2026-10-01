@@ -16,8 +16,7 @@ default-members = [".", "scripts"]
 
 [dependencies]
 include_dir = "0.7"
-# we'll need to wait for a new release of wast before releasing this again since the latest testsuite changes currently break it
-wast = { git = "https://github.com/bytecodealliance/wasm-tools", optional = true }
+wast = { version = ">=260.0", optional = true }
 
 [dev-dependencies]
 eyre = "0.6"
